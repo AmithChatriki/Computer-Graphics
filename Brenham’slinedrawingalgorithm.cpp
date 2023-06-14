@@ -1,99 +1,99 @@
-#include <GL/glut.h>
-#include <stdio.h>
-int x1, y1, x2, y2;
-
-void myInit()
+#include<iostream>
+#include<math.h>
+#include<GL/glut.h>
+using namespace std;
+int xx, yy, xend, yend;
+void myinit()
 {
-    glClear(GL_COLOR_BUFFER_BIT);
-    glClearColor(0.0, 0.0, 0.0, 1.0);
-    glMatrixMode(GL_PROJECTION);
-    gluOrtho2D(0, 500, 0, 500);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluOrtho2D(0, 500, 0, 500);
+	glMatrixMode(GL_MODELVIEW);
 }
-
-void draw_pixel(int x, int y)
+void setPixel(int x, int y)
 {
-    glBegin(GL_POINTS);
-    glVertex2i(x, y);
-    glEnd();
-}
 
-void draw_line(int x1, int x2, int y1, int y2)
+	glBegin(GL_POINTS);
+	glVertex2f(x, y);
+	glEnd();
+	glFlush();
+
+}
+void Bresenhamline()
 {
-    int dx, dy, i, e, x, y, incx, incy, inc1, inc2;
-    dx = x2-x1;
-    dy = y2-y1;
-    if (dx < 0)
-        dx = -dx;
-    if (dy < 0)
-        dy = -dy;
-    
-    incx = 1;
-    if (x2 < x1)
-        incx = -1;
-    
-    incy = 1;
-    if (y2 < y1)
-        incy = -1;
-    
-    x = x1; y = y1;
+	int dx = abs(xend - xx), dy = abs(yend - yy);
+	int p, x, y;
+	int twody = 2 * dy, twodyMinustwodx = 2 * (dy - dx);
+	int twodx = 2 * dx, twodxMinustwody = 2 * (dx - dy);
+	x = xx;
+	y = yy;
+	glColor3f(1, 0, 0); // Set color to red.
+	glPointSize(3); //Set point size to 3
+	if (dx > dy)
+	{
+		//For slope m&lt;1
+		p = 2 * dy - dx;
+		setPixel(x, y);
+		while (x < xend)
+		{
+			x = x + 1;
+			if (p < 0)
 
-    if (dx > dy) 
-    {
-        draw_pixel(x, y);
-        e = 2 * dy-dx;
-        inc1 = 2*(dy-dx);
-        inc2 = 2*dy;
-        for (i=0; i<dx; i++) 
-        {
-            if (e >= 0) 
-            {
-                y += incy;
-                e += inc1;
-            }
-            else
-                e += inc2;
-            x += incx;
-            draw_pixel(x, y);
-        }
-    }
-    else
-    {
-        draw_pixel(x, y);
-        e = 2*dx-dy;
-        inc1 = 2*(dx-dy);
-        inc2 = 2*dx;
-        for (i=0; i<dy; i++)
-        {
-            if (e >= 0)
-            {
-                x += incx;
-                e += inc1;
-            }
-            else
-                e += inc2;
-            y += incy;
-            draw_pixel(x, y);
-        }
-    }
+				p = p + twody;
+			else
+			{
+				y = y + 1;
+
+				p = p + twodyMinustwodx;
+			}
+
+			setPixel(x, y);
+			cout << x << "\t" << y << endl;
+
+		}
+	}
+	else
+	{
+		//For slope m > 1
+		p = 2 * dx - dy;
+		setPixel(x, y);
+		while (y < yend)
+		{
+			y = y + 1;
+			if (p < 0)
+
+				p = p + twodx;
+			else
+			{
+				x = x + 1;
+				p = p + twodxMinustwody;
+			}
+			setPixel(x, y);
+			cout << x << "\t" << y << endl;
+		}
+	}
+
 }
-
-void myDisplay() 
+void display()
 {
-    draw_line(x1, x2, y1, y2);
-    glFlush();
+	glClearColor(1, 1, 1, 1); //Specifies a background RGB color for a display window.
+	glClear(GL_COLOR_BUFFER_BIT);// Clear display window.
+	Bresenhamline();
+	glFlush(); // Process all OpenGL routines as quickly as possible.
 }
-
 int main(int argc, char **argv)
 {
-    printf( "Enter (x1, y1, x2, y2)\n");
-    scanf("%d %d %d %d", &x1, &y1, &x2, &y2);
-    glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_SINGLE|GLUT_RGB);
-    glutInitWindowSize(500, 500);
-    glutInitWindowPosition(0, 0);
-    glutCreateWindow("Bresenham's Line Drawing");
-    myInit();
-    glutDisplayFunc(myDisplay);
-    glutMainLoop();
-    return 0;
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_RGB | GLUT_SINGLE);// Set display mode.
+	glutInitWindowPosition(100, 100); // Set top-left display-window position.
+	glutInitWindowSize(500, 500); // Set display-window width and height.
+	glutCreateWindow("Bresenham Line Drawing Algorthm ");// Create display window.
+	myinit(); // Execute initialization procedure.
+	cout << "Enter co - ordinates of first point :";
+	cin >> xx >> yy;
+	cout << "Enter co - ordinates of second point :";
+	cin >> xend >> yend;
+	glutDisplayFunc(display);//Invokes a function to create a picture within current display window.
+	glutMainLoop(); //Executes the computer-graphics program.
+	return 0;
 }
